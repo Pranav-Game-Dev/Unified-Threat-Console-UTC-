@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTC — Unified Threat Console</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+  <aside id="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-inverse)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">UTC</div>
+        <div class="brand-sub">Threat Console</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Monitor</div>
+
+      <div class="nav-item active" data-section="overview" onclick="navigate('overview')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        <span>Overview</span>
+      </div>
+
+      <div class="nav-item" data-section="network" onclick="navigate('network')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
+          <path d="M12 7v4M8.5 17l3.5-6M15.5 17l-3.5-6"/>
+        </svg>
+        <span>Network</span>
+      </div>
+
+      <div class="nav-item" data-section="threats" onclick="navigate('threats')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>Threats</span>
+        <span class="nav-badge" id="threat-badge" style="display:none">0</span>
+      </div>
+
+      <div class="nav-section-label">Tools</div>
+
+      <div class="nav-item" data-section="scanner" onclick="navigate('scanner')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>Vuln Scanner</span>
+      </div>
+
+      <div class="nav-item" data-section="logs" onclick="navigate('logs')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span>Logs &amp; Alerts</span>
+      </div>
+
+      <div class="nav-item" data-section="files" onclick="navigate('files')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span>File Transfer</span>
+      </div>
+
+      <div class="nav-section-label">Config</div>
+
+      <div class="nav-item" data-section="simulator" onclick="navigate('simulator')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span>Simulator</span>
+      </div>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="ws-status">
+        <span class="ws-dot" id="ws-dot"></span>
+        <span id="ws-label">Disconnected</span>
+      </div>
+      <div class="theme-toggle" onclick="toggleTheme()">
+        <span>Theme</span>
+        <div class="toggle-track" id="theme-track">
+          <div class="toggle-thumb"></div>
+        </div>
+        <span id="theme-label">Dark</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── Main Area ─────────────────────────────────────────────────────────── -->
+  <div id="main">
+
+    <header id="topbar">
+      <div class="topbar-title" id="page-title">Overview</div>
+      <div class="topbar-meta" id="packets-live">PKT/S: —</div>
+      <div id="system-health" style="display:flex;align-items:center;gap:6px;font-size:0.65rem">
+        <span id="health-dot" style="width:7px;height:7px;border-radius:50%;background:var(--text-muted);flex-shrink:0;transition:background 0.4s"></span>
+        <span id="health-label" style="color:var(--text-muted);letter-spacing:0.08em">INITIALISING</span>
+      </div>
+      <div id="threat-level" style="font-size:0.65rem;letter-spacing:0.08em;color:var(--text-muted);cursor:default" title="Threat level based on active IDS alerts">THREAT: NONE</div>
+      <div class="topbar-clock" id="clock">—</div>
+      <div class="topbar-alerts" onclick="navigate('threats')" title="Open Threats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        <div class="alert-pip" id="alert-pip"></div>
+      </div>
+    </header>
+
+    <main id="content">
+
+      <!-- OVERVIEW -->
+      <section class="section active" id="section-overview">
+        <div class="stat-row">
+          <div class="stat-card" style="--card-accent: var(--accent-cyan)">
+            <div class="stat-label">Packets Captured</div>
+            <div class="stat-value accent-cyan" id="ov-packets">0</div>
+            <div class="stat-sub"><span id="ov-pps">0</span> pkt/s live</div>
+          </div>
+          <div class="stat-card" style="--card-accent: var(--accent-red)">
+            <div class="stat-label">Active Alerts</div>
+            <div class="stat-value accent-red" id="ov-alerts">0</div>
+            <div class="stat-sub"><span id="ov-critical">0</span> critical</div>
+          </div>
+          <div class="stat-card" style="--card-accent: var(--accent-amber)">
+            <div class="stat-label">Suspicious IPs</div>
+            <div class="stat-value accent-amber" id="ov-suspicious">0</div>
+            <div class="stat-sub">detected total</div>
+          </div>
+          <div class="stat-card" style="--card-accent: var(--accent-green)">
+            <div class="stat-label">System Status</div>
+            <div class="stat-value accent-green" style="font-size:1rem; margin-top:2px" id="ov-status">ONLINE</div>
+            <div class="stat-sub" id="ov-uptime">IDS active</div>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Live Traffic</div>
+              <span class="badge badge-active" id="capture-badge">INACTIVE</span>
+            </div>
+            <div class="traffic-chart-wrap">
+              <canvas id="traffic-chart"></canvas>
+            </div>
+            <div class="proto-pills" id="proto-pills">
+              <span class="text-dim" style="font-size:0.65rem">No traffic yet</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Recent Alerts</div>
+              <div class="panel-actions">
+                <span class="btn btn-ghost" onclick="navigate('threats')">View all</span>
+              </div>
+            </div>
+            <div class="panel-body" style="max-height:220px; overflow-y:auto">
+              <table class="data-table">
+                <thead><tr><th>Time</th><th>Severity</th><th>Rule</th><th>Source</th></tr></thead>
+                <tbody id="ov-alert-table">
+                  <tr><td colspan="4"><div class="empty-state">No alerts yet</div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Packet Feed</div>
+            <div class="panel-actions">
+              <span class="panel-subtitle" id="feed-count">0 packets</span>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:80px 55px 110px 110px 55px 1fr; background:var(--bg-elevated); border-bottom:1px solid var(--border-dim);">
+            <div style="padding:5px 12px; font-size:0.58rem; letter-spacing:0.12em; color:var(--text-muted); text-transform:uppercase; font-weight:600">Time</div>
+            <div style="padding:5px 6px; font-size:0.58rem; letter-spacing:0.12em; color:var(--text-muted); text-transform:uppercase; font-weight:600">Proto</div>
+            <div style="padding:5px 6px; font-size:0.58rem; letter-spacing:0.12em; color:var(--text-muted); text-transform:uppercase; font-weight:600">Src IP</div>
+            <div style="padding:5px 6px; font-size:0.58rem; letter-spacing:0.12em; color:var(--text-muted); text-transform:uppercase; font-weight:600">Dst IP</div>
+            <div style="padding:5px 6px; font-size:0.58rem; letter-spacing:0.12em; color:var(--text-muted); text-transform:uppercase; font-weight:600">Port</div>
+            <div style="padding:5px 6px; font-size:0.58rem; letter-spacing:0.12em; color:var(--text-muted); text-transform:uppercase; font-weight:600">Note</div>
+          </div>
+          <div class="live-feed" id="packet-feed">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Waiting for packets…
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NETWORK -->
+      <section class="section" id="section-network">
+        <div class="stat-row">
+          <div class="stat-card" style="--card-accent: var(--accent-cyan)">
+            <div class="stat-label">Total Packets</div>
+            <div class="stat-value accent-cyan" id="net-total">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent: var(--accent-amber)">
+            <div class="stat-label">Suspicious</div>
+            <div class="stat-value accent-amber" id="net-suspicious">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent: var(--accent-teal)">
+            <div class="stat-label">Top Protocol</div>
+            <div class="stat-value" style="font-size:1rem;margin-top:4px" id="net-top-proto">—</div>
+          </div>
+          <div class="stat-card" style="--card-accent: var(--accent-green)">
+            <div class="stat-label">Pkt/sec</div>
+            <div class="stat-value accent-green" id="net-pps">0</div>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Traffic Volume</div>
+              <span class="badge badge-active" id="net-capture-status">INACTIVE</span>
+            </div>
+            <div class="chart-wrap" style="height:200px"><canvas id="net-traffic-chart"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Protocol Distribution</div></div>
+            <div class="chart-wrap" style="height:200px; display:flex;align-items:center;justify-content:center">
+              <canvas id="proto-chart" style="max-width:180px;max-height:180px"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Packet Log</div>
+            <div class="panel-actions">
+              <select class="input-select" id="net-filter-proto" onchange="applyNetworkFilter()">
+                <option value="">All Protocols</option>
+                <option value="TCP">TCP</option><option value="UDP">UDP</option><option value="ICMP">ICMP</option>
+              </select>
+              <label style="display:flex;align-items:center;gap:5px;font-size:0.65rem;color:var(--text-secondary);cursor:pointer">
+                <input type="checkbox" id="net-filter-suspicious" onchange="applyNetworkFilter()" style="accent-color:var(--accent-amber)">
+                Suspicious only
+              </label>
+            </div>
+          </div>
+          <div class="panel-body" style="max-height:340px;overflow-y:auto">
+            <table class="data-table">
+              <thead><tr><th>Timestamp</th><th>Protocol</th><th>Src IP</th><th>Dst IP</th><th>Src Port</th><th>Dst Port</th><th>Size</th><th>Flags</th><th>Status</th></tr></thead>
+              <tbody id="net-packet-tbody"><tr><td colspan="9"><div class="empty-state">No packets captured yet</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Top Source IPs</div></div>
+          <div class="panel-body" style="max-height:200px;overflow-y:auto">
+            <table class="data-table">
+              <thead><tr><th>IP Address</th><th>Packets</th><th>Pkt/s</th><th>Suspicious</th></tr></thead>
+              <tbody id="top-ips-tbody"><tr><td colspan="4"><div class="empty-state">No data yet</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- THREATS -->
+      <section class="section" id="section-threats">
+        <div class="stat-row">
+          <div class="stat-card" style="--card-accent:var(--severity-critical)">
+            <div class="stat-label">Critical</div><div class="stat-value accent-red" id="sev-critical">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--severity-high)">
+            <div class="stat-label">High</div><div class="stat-value" style="color:var(--severity-high)" id="sev-high">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--severity-medium)">
+            <div class="stat-label">Medium</div><div class="stat-value accent-amber" id="sev-medium">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--severity-low)">
+            <div class="stat-label">Low</div><div class="stat-value accent-cyan" id="sev-low">0</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">IDS Alert Feed</div>
+            <div class="panel-actions">
+              <select class="input-select" id="threat-filter-sev" onchange="loadAlerts()">
+                <option value="">All Severities</option>
+                <option value="critical">Critical</option><option value="high">High</option>
+                <option value="medium">Medium</option><option value="low">Low</option>
+              </select>
+              <button class="btn btn-ghost" onclick="acknowledgeAll()">Ack All</button>
+              <button class="btn btn-ghost" onclick="clearAlertList()" style="color:var(--accent-red);border-color:var(--accent-red)">Clear List</button>
+              <button class="btn btn-ghost" onclick="loadAlerts()">Reload</button>
+            </div>
+          </div>
+          <div class="panel-body" style="max-height:420px;overflow-y:auto">
+            <table class="data-table">
+              <thead><tr><th>Time</th><th>Severity</th><th>Rule</th><th>Source IP</th><th>Dst</th><th>Description</th><th>Confidence</th><th>Action</th></tr></thead>
+              <tbody id="alert-tbody"><tr><td colspan="7"><div class="empty-state">No alerts detected</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Alert Timeline</div></div>
+            <div class="chart-wrap" style="height:180px"><canvas id="alert-timeline-chart"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Attack Types</div></div>
+            <div class="chart-wrap" style="height:180px;display:flex;align-items:center;justify-content:center">
+              <canvas id="attack-type-chart" style="max-width:160px;max-height:160px"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCANNER -->
+      <section class="section" id="section-scanner">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Web Vulnerability Scanner</div>
+            <span class="badge badge-inactive" id="scan-status-badge">IDLE</span>
+          </div>
+          <div class="form-row">
+            <input type="text" class="input-field" id="scan-target" placeholder="https://target.example.com" onkeydown="if(event.key==='Enter') startScan()">
+            <select class="input-select" id="scan-type">
+              <option value="full">Full Scan</option>
+              <option value="sqli">SQL Injection</option>
+              <option value="xss">XSS</option>
+            </select>
+            <button class="btn btn-primary" id="scan-btn" onclick="startScan()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Scan
+            </button>
+          </div>
+          <div class="scan-progress" id="scan-progress-wrap" style="display:none; margin-top:8px">
+            <div class="scan-progress-bar" id="scan-progress-bar"></div>
+          </div>
+          <div id="scan-summary" style="display:none;padding:10px 16px;border-bottom:1px solid var(--border-dim);font-size:0.7rem;color:var(--text-secondary)"></div>
+        </div>
+
+        <!-- Scan Verdict Panel -->
+        <div id="scan-verdict-panel" style="display:none; margin-bottom:10px">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Scan Verdict</div>
+              <span class="panel-subtitle" id="verdict-timestamp"></span>
+            </div>
+            <div style="padding:14px 16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap">
+              <div id="verdict-badge" style="font-size:1.6rem; font-weight:800; font-family:var(--font-display); letter-spacing:0.04em">—</div>
+              <div style="flex:1; min-width:200px">
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <span style="font-size:0.65rem;color:var(--text-muted)">
+                    Confirmed: <strong id="vs-confirmed" style="color:var(--accent-red)">0</strong>
+                  </span>
+                  <span style="font-size:0.65rem;color:var(--text-muted)">
+                    Potential: <strong id="vs-potential" style="color:var(--accent-amber)">0</strong>
+                  </span>
+                  <span style="font-size:0.65rem;color:var(--text-muted)">
+                    Informational: <strong id="vs-info" style="color:var(--text-secondary)">0</strong>
+                  </span>
+                </div>
+                <div id="verdict-explanation" style="font-size:0.68rem;color:var(--text-secondary);margin-top:6px;line-height:1.5"></div>
+              </div>
+            </div>
+            <div id="verdict-type-summary" style="padding:0 16px 12px; display:flex; gap:8px; flex-wrap:wrap"></div>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Findings</div>
+              <span class="panel-subtitle" id="finding-count">0 found</span>
+            </div>
+            <div class="panel-body" style="max-height:360px;overflow-y:auto" id="findings-body">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Run a scan to see findings
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Scan History</div></div>
+            <div class="panel-body" style="max-height:360px;overflow-y:auto">
+              <table class="data-table">
+                <thead><tr><th>Time</th><th>Target</th><th>Type</th><th>Found</th><th>Status</th></tr></thead>
+                <tbody id="scan-history-tbody"><tr><td colspan="5"><div class="empty-state">No scans yet</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOGS -->
+      <section class="section" id="section-logs">
+        <div class="stat-row">
+          <div class="stat-card" style="--card-accent:var(--accent-red)">
+            <div class="stat-label">Flagged</div><div class="stat-value accent-red" id="log-flagged">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--accent-amber)">
+            <div class="stat-label">Warnings</div><div class="stat-value accent-amber" id="log-warnings">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--accent-cyan)">
+            <div class="stat-label">Total Entries</div><div class="stat-value accent-cyan" id="log-total">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--accent-green)">
+            <div class="stat-label">Sources Active</div><div class="stat-value accent-green" id="log-sources">4</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">System Log Stream</div>
+            <div class="panel-actions">
+              <select class="input-select" id="log-filter-source" onchange="loadLogs()">
+                <option value="">All Sources</option>
+                <option value="network">Network</option><option value="ids">IDS</option>
+                <option value="system">System</option><option value="transfer">Transfer</option>
+              </select>
+              <select class="input-select" id="log-filter-level" onchange="loadLogs()">
+                <option value="">All Levels</option>
+                <option value="debug">Debug</option><option value="info">Info</option>
+                <option value="warning">Warning</option><option value="error">Error</option>
+                <option value="critical">Critical</option>
+              </select>
+              <label style="display:flex;align-items:center;gap:5px;font-size:0.65rem;color:var(--text-secondary);cursor:pointer">
+                <input type="checkbox" id="log-filter-flagged" onchange="loadLogs()" style="accent-color:var(--accent-red)">
+                Flagged only
+              </label>
+              <button class="btn btn-ghost" onclick="loadLogs()">Refresh</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:90px 60px 70px 1fr;background:var(--bg-elevated);border-bottom:1px solid var(--border-dim);">
+            <div style="padding:5px 12px;font-size:0.58rem;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;font-weight:600">Time</div>
+            <div style="padding:5px 6px;font-size:0.58rem;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;font-weight:600">Source</div>
+            <div style="padding:5px 6px;font-size:0.58rem;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;font-weight:600">Level</div>
+            <div style="padding:5px 6px;font-size:0.58rem;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;font-weight:600">Message</div>
+          </div>
+
+          <div style="max-height:480px;overflow-y:auto" id="log-stream">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              No log entries yet
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILES -->
+      <section class="section" id="section-files">
+        <div class="stat-row">
+          <div class="stat-card" style="--card-accent:var(--accent-green)">
+            <div class="stat-label">Uploads</div><div class="stat-value accent-green" id="file-uploads">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--accent-cyan)">
+            <div class="stat-label">Downloads</div><div class="stat-value accent-cyan" id="file-downloads">0</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--accent-amber)">
+            <div class="stat-label">Encryption</div>
+            <div class="stat-value" style="font-size:0.85rem;margin-top:4px;color:var(--accent-amber)">AES-256-GCM</div>
+          </div>
+          <div class="stat-card" style="--card-accent:var(--accent-purple)">
+            <div class="stat-label">Total Files</div><div class="stat-value" style="color:var(--accent-purple)" id="file-total">0</div>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Secure Upload</div>
+              <span class="badge badge-ok">AES-256-GCM</span>
+            </div>
+            <div class="file-drop-zone" id="drop-zone"
+              onclick="document.getElementById('file-input').click()"
+              ondragover="event.preventDefault();this.classList.add('drag-over')"
+              ondragleave="this.classList.remove('drag-over')"
+              ondrop="handleFileDrop(event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <div>Drop file here or click to select</div>
+              <div style="font-size:0.62rem;margin-top:4px;color:var(--text-muted)">Encrypted with AES-256-GCM before storage</div>
+            </div>
+            <input type="file" id="file-input" style="display:none" onchange="uploadFile(this.files[0])">
+            <!-- Optional expiry + password fields -->
+            <div style="display:flex;gap:8px;padding:8px 16px 0;font-size:0.7rem;color:var(--text-secondary)">
+              <div style="flex:1">
+                <label style="display:block;font-size:0.6rem;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:3px;text-transform:uppercase">Expiry Hours (optional)</label>
+                <input type="number" id="upload-expiry-hours" class="input-field" placeholder="e.g. 24" min="0" max="8760" style="width:100%">
+              </div>
+              <div style="flex:1">
+                <label style="display:block;font-size:0.6rem;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:3px;text-transform:uppercase">Expiry Minutes (optional)</label>
+                <input type="number" id="upload-expiry-minutes" class="input-field" placeholder="e.g. 30" min="0" max="59" style="width:100%">
+              </div>
+              <div style="flex:1">
+                <label style="display:block;font-size:0.6rem;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:3px;text-transform:uppercase">Password (optional)</label>
+                <input type="password" id="upload-password" class="input-field" placeholder="Leave blank = no password" style="width:100%">
+              </div>
+            </div>
+            <div id="upload-progress-wrap" style="display:none;padding:0 16px 12px;margin-top:8px">
+              <div class="scan-progress"><div class="scan-progress-bar" id="upload-progress-bar"></div></div>
+              <div style="font-size:0.65rem;color:var(--text-muted);margin-top:4px" id="upload-status">Encrypting...</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Stored Files</div>
+              <button class="btn btn-ghost" onclick="loadFileTransfers()">Refresh</button>
+            </div>
+            <div class="panel-body" style="max-height:280px;overflow-y:auto" id="file-list-body">
+              <div class="empty-state">No files stored yet</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Transfer History</div></div>
+          <div class="panel-body" style="max-height:220px;overflow-y:auto">
+            <table class="data-table">
+              <thead><tr><th>Time</th><th>Direction</th><th>Filename</th><th>Size</th><th>Encryption</th><th>Status</th></tr></thead>
+              <tbody id="transfer-tbody"><tr><td colspan="6"><div class="empty-state">No transfers yet</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SIMULATOR -->
+      <section class="section" id="section-simulator">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Attack Simulator</div>
+            <span class="badge badge-medium">TEST MODE</span>
+          </div>
+          <div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+
+            <div class="stat-card" style="--card-accent:var(--accent-amber)">
+              <div class="stat-label">Port Scan</div>
+              <div class="stat-value" style="font-size:0.9rem;margin-top:4px;color:var(--accent-amber)">SYN Sweep</div>
+              <div class="stat-sub">Simulates Nmap-style scan</div>
+              <div style="margin-top:8px"><button class="btn btn-amber" style="width:100%" onclick="runSimulation('port_scan')">Run Simulation</button></div>
+            </div>
+
+            <div class="stat-card" style="--card-accent:var(--accent-red)">
+              <div class="stat-label">DoS Attack</div>
+              <div class="stat-value" style="font-size:0.9rem;margin-top:4px;color:var(--accent-red)">Flood</div>
+              <div class="stat-sub">High-volume packet burst</div>
+              <div style="margin-top:8px"><button class="btn btn-danger" style="width:100%" onclick="runSimulation('dos')">Run Simulation</button></div>
+            </div>
+
+            <div class="stat-card" style="--card-accent:var(--accent-purple)">
+              <div class="stat-label">Brute Force</div>
+              <div class="stat-value" style="font-size:0.9rem;margin-top:4px;color:var(--accent-purple)">SSH / HTTP</div>
+              <div class="stat-sub">Rapid auth attempt replay</div>
+              <div style="margin-top:8px"><button class="btn" style="color:var(--accent-purple);border-color:var(--accent-purple);width:100%" onclick="runSimulation('brute_force')">Run Simulation</button></div>
+            </div>
+
+            <div class="stat-card" style="--card-accent:var(--accent-cyan)">
+              <div class="stat-label">Traffic Spike</div>
+              <div class="stat-value" style="font-size:0.9rem;margin-top:4px;color:var(--accent-cyan)">Anomaly</div>
+              <div class="stat-sub">Sudden volume surge</div>
+              <div style="margin-top:8px"><button class="btn btn-primary" style="width:100%" onclick="runSimulation('traffic_spike')">Run Simulation</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Simulation Log</div></div>
+          <div id="sim-log" style="padding:12px 16px;height:200px;overflow-y:auto;font-size:0.7rem;font-family:var(--font-mono);color:var(--text-secondary)">
+            <span class="text-dim">Simulator ready. Select an attack type above.</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

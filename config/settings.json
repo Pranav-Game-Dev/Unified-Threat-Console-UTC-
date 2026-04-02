@@ -1,0 +1,65 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8000,
+    "debug": false,
+    "log_level": "info"
+  },
+  "network_monitor": {
+    "enabled": true,
+    "interface": null,
+    "packet_buffer": 500,
+    "capture_filter": "",
+    "traffic_spike_threshold": 100,
+    "suspicious_ports": [
+      22,
+      23,
+      3389,
+      4444,
+      5900,
+      6666,
+      8080
+    ]
+  },
+  "ids": {
+    "enabled": true,
+    "port_scan_threshold": 15,
+    "port_scan_window_sec": 5,
+    "dos_threshold": 200,
+    "brute_force_threshold": 10,
+    "brute_force_window_sec": 30,
+    "syn_flood_threshold": 50,
+    "dns_tunnel_threshold": 25
+  },
+  "vuln_scanner": {
+    "timeout_sec": 10,
+    "max_redirects": 3,
+    "user_agent": "UTC-VulnScanner/1.0"
+  },
+  "log_monitor": {
+    "enabled": true,
+    "check_interval_sec": 5,
+    "max_log_lines": 1000,
+    "alert_keywords": [
+      "error",
+      "critical",
+      "unauthorized",
+      "failed",
+      "denied"
+    ]
+  },
+  "file_transfer": {
+    "max_file_size_mb": 100,
+    "allowed_extensions": [],
+    "encryption": "AES-256-GCM"
+  },
+  "alerts": {
+    "console": true,
+    "email": false,
+    "email_smtp": "",
+    "email_port": 587,
+    "email_user": "",
+    "email_password": "",
+    "email_to": ""
+  }
+}

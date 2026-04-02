@@ -1,0 +1,23 @@
+# UTC — Unified Threat Console
+# Install: pip install -r requirements.txt
+# Windows: also install Npcap from https://npcap.com/#download
+
+# ── Web Framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.12
+pydantic==2.10.3
+
+# ── Packet Capture ────────────────────────────────────────────────────────────
+scapy==2.6.1
+
+# ── Cryptography ──────────────────────────────────────────────────────────────
+cryptography==43.0.3
+
+# ── HTTP Client / Scanner ─────────────────────────────────────────────────────
+requests==2.32.3
+beautifulsoup4==4.12.3
+urllib3==2.2.3
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+psutil==6.1.0
