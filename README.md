@@ -170,25 +170,6 @@ python run.py
 
 ---
 
-## Limitations
-
-* Rule-based detection only
-* Not enterprise-grade
-* Requires administrative privileges
-* Limited scalability
-
----
-
-## Future Improvements
-
-* Machine learning-based detection
-* Cloud deployment
-* Threat intelligence integration
-* Role-based access control
-* Automated response system
-
----
-
 ## License
 
 This project is intended for educational and academic purposes.
