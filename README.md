@@ -97,22 +97,32 @@ Modern cybersecurity systems often rely on multiple independent tools, leading t
 ## Project Structure
 
 ```
-Unified-Threat-Console/
-├── backend/
+Unified Threat Console (UTC)
+├── app
+│   ├── modules
+│   │   ├── file_transfer.py
+│   │   ├── ids_engine.py
+│   │   ├── log_monitor.py
+│   │   ├── network_monitor.py
+│   │   └── vuln_scanner.py
+│   ├── routers
+│   │   ├── files.py
+│   │   ├── logs.py
+│   │   ├── network.py
+│   │   ├── scanner.py
+│   │   └── threats.py
+│   ├── config.py
+│   ├── database.py
 │   ├── main.py
-│   ├── network_monitor.py
-│   ├── ids_engine.py
-│   ├── vuln_scanner.py
-│   ├── file_transfer.py
-│   ├── logs.py
-│   └── database.py
-├── frontend/
+│   └── ws_manager.py
+├── config
+│   └── settings.json
+├── dashboard
+│   ├── app.js
 │   ├── index.html
-│   ├── style.css
-│   └── app.js
-├── uploads/
-├── logs/
-├── config.py
+│   └── style.css
+├── README.md
+├── requirements.txt
 └── run.py
 ```
 
