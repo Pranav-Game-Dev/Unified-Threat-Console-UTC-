@@ -160,10 +160,9 @@ cd unified-threat-console
 
 2. Install dependencies:
 
-```
 Install Npcap (Windows) — required for live packet capture : 
 https://npcap.com/#download
-
+```
 pip install -r requirements.txt
 ```
 
