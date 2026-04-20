@@ -86,7 +86,7 @@ Modern cybersecurity systems often rely on multiple independent tools, leading t
 
 ## System Architecture
 
-* Backend: Python (FastAPI)
+* Backend: Python (FastAPI), Npcap (Windows)
 * Frontend: HTML, CSS, JavaScript
 * Database: SQLite
 * Real-time Communication: WebSockets
@@ -128,6 +128,27 @@ Unified Threat Console (UTC)
 
 ---
 
+## Screenshots
+<img width="1919" height="1079" alt="Overview" src="https://github.com/user-attachments/assets/0e7901be-9640-488d-9bf8-b027492b5f5c" /> 
+<p align="center">Overview Page</p>
+
+<img width="1918" height="1079" alt="Network" src="https://github.com/user-attachments/assets/bf2885aa-487d-407e-abc7-e5569455d884" />
+<p align="center">Network Monitor page</p>
+
+<img width="1912" height="1071" alt="Threats" src="https://github.com/user-attachments/assets/36c9f5c7-8f18-4ec4-830a-f780855f5310" />
+<p align="center">Threat Detection page</p>
+
+<img width="1919" height="1079" alt="Vulnerability Scanner" src="https://github.com/user-attachments/assets/7f22e206-0c2e-4b77-a054-de527a720067" />
+<p align="center">Vulnerability Scanner page</p>
+
+<img width="1919" height="1079" alt="Logs" src="https://github.com/user-attachments/assets/00754bca-7bff-4a30-ba3b-6416252d5b1a" />
+<p align="center">Logs and Alerts page</p>
+
+<img width="1919" height="1079" alt="attack simulator" src="https://github.com/user-attachments/assets/a4252733-a290-4559-8bb3-ca3c59e82b55" />
+<p align="center">Attack Simulator page</p>
+
+---
+
 ## Installation
 
 1. Clone the repository:
@@ -140,6 +161,9 @@ cd unified-threat-console
 2. Install dependencies:
 
 ```
+Install Npcap (Windows) — required for live packet capture : 
+https://npcap.com/#download
+
 pip install -r requirements.txt
 ```
 
